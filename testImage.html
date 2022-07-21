@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="1000" height="1000"></canvas>
+
+    <script>
+        var canvas = document.getElementById('myCanvas');
+            var context = canvas.getContext('2d');
+            var context1 = canvas.getContext('2d');
+            var context2 = canvas.getContext('2d');
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+
+            var x = centerX;
+            var y = centerY;
+            var imageObj = new Image();
+            imageObj.src = './rocket_100_283.png';
+            imageObj.onload = function () {
+                context.drawImage(imageObj, x, y);
+            };
+    </script>
+</body>
+</html>

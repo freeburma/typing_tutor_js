@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="1000" height="1000"></canvas>
+
+    <script>
+        window.addEventListener('load', function () {
+  var
+    img = new Image,
+    ctx = document.getElementById('myCanvas').getContext('2d');
+  
+  img.src = './rocket_100_283.png';
+  img.addEventListener('load', function () {
+
+    var interval = setInterval(function() {
+      var x = 0, y = 0;
+      
+      return function () {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.drawImage(img, x, y);
+
+        x += 1;
+        if (x > ctx.canvas.width) {
+          x = 0;
+        }
+      };
+    }(), 1000/40);
+  }, false);
+}, false);
+    </script>
+</body>
+</html>
