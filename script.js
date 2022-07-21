@@ -29,29 +29,42 @@ const charList = [
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
                  ]; 
 
+//// Arrays 
 let charObjectArray = [];
- 
+let rocketArray = []; 
 
 
 
 // console.log(`Canvas: ${CANVAS_WIDTH}, ${CANVAS_HEIGHT}`);
 
-/* Char must be A-Z a-z and 0-9 */
-class AlphaNumericChar
+class BaseSprite
 {
-
- 
     constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, dy=0.5)
     {
         this.ctx = ctx;                     // Canvas 
 
         this.id = id;                       // Id : too search. Index 
-        this.alphaNumericChar = alphaNumericChar; 
+        this.alphaNumericChar = alphaNumericChar;
         this.charSize = charSize; 
+
         this.xPos = xPos; 
         this.yPos = yPos; 
         
         this.dy = dy;                       // Dropping top to bottom of y coordinates 
+
+    }//end constructor()
+
+}// end class Parent
+
+/* Char must be A-Z a-z and 0-9 */
+class AlphaNumericChar extends BaseSprite
+{
+
+ 
+    constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, dy=0.5)
+    {
+        super(ctx, id, alphaNumericChar, charSize, xPos, yPos, dy); 
+       
     }// end constructor()
 
     drawChar()
@@ -89,16 +102,14 @@ class AlphaNumericChar
 // let bullet_X = CANVAS_WIDTH; 
 // let bullet_Y = CANVAS_HEIGHT; 
 
-class Bullet 
+
+
+
+class Bullet extends BaseSprite
 {
-    constructor(ctx, xPos=200, yPos=200, bulletWidth, bulletHeight, isFired=false, dy)
+    constructor(ctx, id, alphaNumericChar, xPos=200, yPos=200, bulletWidth, bulletHeight, isFired=false, dy)
     {
-        this.ctx = ctx; 
-
-        this.xPos = xPos; 
-        this.yPos = yPos; 
-
-        
+        super(ctx, id, alphaNumericChar, charSize, xPos, yPos, dy); 
 
         this.bulletWidth = bulletWidth; 
         this.bulletHeight = bulletHeight; 
@@ -155,9 +166,9 @@ function getRandom_yPos()
 
 
 let isInit = true; 
-let isRocketFire = false; 
+let rocketToFireArray = []; 
+let keyDownChar = ''; 
 
-let bullet = new Bullet(ctx, xPos=getRandom_xPos(), yPos=CANVAS_HEIGHT, bulletWidth, bulletHeight, isFired=false, 1.5); 
 
 /**
     All the initialize objects must be inside the "IF" or outside of this loop. 
@@ -171,8 +182,16 @@ function init()
         {
             const randomCharIndex = Math.floor(Math.random() * (charList.length - 1)); 
 
-            let ch = new AlphaNumericChar(ctx=ctx, id=i, alphaNumericChar=charList[randomCharIndex], charSize='20px', xPos=getRandom_xPos(), yPos=getRandom_yPos(), dy=0.25); 
+            let chosenChar = charList[randomCharIndex];
+            let dy = 0.25; 
+            let xPos = getRandom_xPos(); 
+
+            let ch = new AlphaNumericChar(ctx=ctx, id=i, alphaNumericChar=chosenChar, charSize='20px', xPos=xPos, yPos=getRandom_yPos(), dy=dy); 
             charObjectArray.push(ch); 
+
+            let rocket = new Bullet(ctx, id=i, alphaNumericChar=chosenChar, xPos=xPos, yPos=CANVAS_HEIGHT, bulletWidth, bulletHeight, isFired=false, dy=(dy * 4)); 
+            rocketArray.push(rocket)
+
         }// end for 
 
        
@@ -181,27 +200,33 @@ function init()
         isInit = false; 
     }// end if 
 
-    for (let i=0; i < NUM_OF_CHARS; i++)
+    for (let i=0; i < charObjectArray.length; i++)
     {
         charObjectArray[i].drawChar(); 
         charObjectArray[i].move(); 
     }// end for 
 
-
-    // bullet.drawRocket(); 
-    // bullet.move(); 
-
-    if (isRocketFire)
+    //// Searching the key 
+    for (let i=0; i < rocketArray.length; i++)
     {
-        // bullet.drawBullet(); 
-        bullet.drawRocket(); 
-        bullet.move(); 
-    }
+        if (rocketArray[i].alphaNumericChar == keyDownChar)
+        {
+            rocketToFireArray.push(rocketArray[i]); 
+            console.log(`Found: ${keyDownChar}`);
+            //// Reset the char 
+            keyDownChar = ''; 
+        }// end if
+    }// end for 
+
+    // for (let i=0; i < rocketArray.length; i++)
+    for (let i=0; i < rocketToFireArray.length; i++)
+    {
+        rocketToFireArray[i].drawRocket(); 
+        rocketToFireArray[i].move(); 
+    }// end for 
     
 
-    
 
-    
     
 }// init()
 
@@ -210,48 +235,27 @@ function renderGame()
 {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); 
 
-    // drawChar(); 
-    // ch_1.drawChar(); 
-    // ch_1.move(); 
-
- 
-
-    
     init(); 
 
-    // drawBullet(); 
-    
-
-
-    
     window.requestAnimationFrame(renderGame); 
 
 }// end renderGame()
 
 //// ============================== Key Pressed Handlers Start ============================================
-let rightPressed = true; 
 function keyDownHandler(e)
 {
-    // if (e.key == 'Right' || e.key == "ArrowRight")
-    // {
-    //     rightPressed = true; 
-    //     console.log(`Right Key Down: ${rightPressed}`);
-
-    // }
-    isRocketFire = true; 
-    console.log(`Rocked Fired : ${isRocketFire}`);
+   
+    keyDownChar = e.key; 
+    console.log(`Key: `, keyDownChar);
+    
+    
 }// end keyDownHandler(e)
 
-function keyUpHandler(e)
-{
-    // if (e.key == 'Right' || e.key == "ArrowRight")
-    // {
-    //     rightPressed = false; 
-    //     console.log(`Right Key Up: ${rightPressed}`);
-    // }
-    isRocketFire = false; 
-
-}// end keyUpHandler(e)
+// function keyUpHandler(e)
+// {
+//     keyDownChar = ''; 
+    
+// }// end keyUpHandler(e)
 
 
 document.addEventListener('keydown', keyDownHandler, false); 
