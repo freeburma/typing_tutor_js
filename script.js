@@ -209,21 +209,29 @@ function init()
     //// Searching the key 
     for (let i=0; i < rocketArray.length; i++)
     {
-        if (rocketArray[i].alphaNumericChar == keyDownChar)
+        if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
         {
-            rocketToFireArray.push(rocketArray[i]); 
+            rocketArray[i].isFired = true; 
+
             console.log(`Found: ${keyDownChar}`);
             //// Reset the char 
             keyDownChar = ''; 
         }// end if
+        
+        if (rocketArray[i].isFired)
+        {
+            rocketArray[i].drawRocket(); 
+            rocketArray[i].move(); 
+        }
+
     }// end for 
 
-    // for (let i=0; i < rocketArray.length; i++)
-    for (let i=0; i < rocketToFireArray.length; i++)
-    {
-        rocketToFireArray[i].drawRocket(); 
-        rocketToFireArray[i].move(); 
-    }// end for 
+    // // for (let i=0; i < rocketArray.length; i++)
+    // for (let i=0; i < rocketToFireArray.length; i++)
+    // {
+    //     rocketToFireArray[i].drawRocket(); 
+    //     rocketToFireArray[i].move(); 
+    // }// end for 
     
 
 
@@ -247,7 +255,7 @@ function keyDownHandler(e)
    
     keyDownChar = e.key; 
     console.log(`Key: `, keyDownChar);
-    
+
     
 }// end keyDownHandler(e)
 
