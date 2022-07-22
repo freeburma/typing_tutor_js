@@ -26,6 +26,9 @@ const charList = [
                     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", 
                     "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", 
                     "U", "V", "W", "X", "Y", "Z", 
+                    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", 
+                    "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", 
+                    "u", "v", "w", "x", "y", "z", 
                     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
                  ]; 
 
@@ -33,7 +36,8 @@ const charList = [
 let charObjectArray = [];
 let rocketArray = []; 
 
-
+let isInit = true; 
+let keyDownChar = ''; 
 
 // console.log(`Canvas: ${CANVAS_WIDTH}, ${CANVAS_HEIGHT}`);
 
@@ -83,28 +87,14 @@ class AlphaNumericChar extends BaseSprite
     move()
     {
         this.yPos += this.dy; 
-    }
+        console.log(`Alphabet ${this.alphaNumericChar} [x,y]: [${this.xPos}, ${this.yPos}]`);
+
+    }// end move()
 
 
 }// end class CharAlphaNumeric
 
-// const charSize='20px'; 
-// function drawChar()
-// {
-//     const xPos = Math.random() * CANVAS_WIDTH; 
-//     const yPos = 30; 
-
-//     ctx.font = `${charSize} Arial`; 
-//     ctx.fillText("A", xPos, yPos); 
-// }// end drawChar()
-
-
-// let bullet_X = CANVAS_WIDTH; 
-// let bullet_Y = CANVAS_HEIGHT; 
-
-
-
-
+// 
 class Bullet extends BaseSprite
 {
     constructor(ctx, id, alphaNumericChar, xPos=200, yPos=200, bulletWidth, bulletHeight, isFired=false, dy)
@@ -146,8 +136,9 @@ class Bullet extends BaseSprite
     move()
     {
         this.yPos -= this.dy;  
-        // console.log(`Bullet yPos: ${this.yPos}`);
-    }
+        console.log(`Rocket ${this.alphaNumericChar} [x,y]: [${this.xPos}, ${this.yPos}]`);
+        
+    }// end move()
 
     
 }// end class Bullet 
@@ -164,10 +155,10 @@ function getRandom_yPos()
     return (Math.random() * 100) - 50; 
 }// end getRandom_yPos()
 
+function detectCollision()
+{
 
-let isInit = true; 
-let rocketToFireArray = []; 
-let keyDownChar = ''; 
+}// end detectCollision()
 
 
 /**
@@ -189,15 +180,14 @@ function init()
             let ch = new AlphaNumericChar(ctx=ctx, id=i, alphaNumericChar=chosenChar, charSize='20px', xPos=xPos, yPos=getRandom_yPos(), dy=dy); 
             charObjectArray.push(ch); 
 
-            let rocket = new Bullet(ctx, id=i, alphaNumericChar=chosenChar, xPos=xPos, yPos=CANVAS_HEIGHT, bulletWidth, bulletHeight, isFired=false, dy=(dy * 4)); 
+            let rocket = new Bullet(ctx, id=i, alphaNumericChar=chosenChar, xPos=xPos, yPos=CANVAS_HEIGHT, bulletWidth, bulletHeight, isFired=false, dy=(dy * 8)); 
             rocketArray.push(rocket)
 
         }// end for 
 
        
-
-
         isInit = false; 
+
     }// end if 
 
     for (let i=0; i < charObjectArray.length; i++)
@@ -226,15 +216,7 @@ function init()
 
     }// end for 
 
-    // // for (let i=0; i < rocketArray.length; i++)
-    // for (let i=0; i < rocketToFireArray.length; i++)
-    // {
-    //     rocketToFireArray[i].drawRocket(); 
-    //     rocketToFireArray[i].move(); 
-    // }// end for 
     
-
-
     
 }// init()
 
