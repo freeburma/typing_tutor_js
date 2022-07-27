@@ -14,7 +14,7 @@ const cannonHeight = 20;
 const bulletWidth = 10; 
 const bulletHeight = 20; 
 
-const NUM_OF_CHARS = 10; 
+const NUM_OF_CHARS = 1; 
 let dY = 0.25; 
 
 const imageObj = new Image;
@@ -43,7 +43,7 @@ let keyDownChar = '';
 
 class BaseSprite
 {
-    constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, dy=0.5)
+    constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, width, height, dy=0.5, isCollide=false)
     {
         this.ctx = ctx;                     // Canvas 
 
@@ -51,10 +51,16 @@ class BaseSprite
         this.alphaNumericChar = alphaNumericChar;
         this.charSize = charSize; 
 
+        //// x & y coordinates 
         this.xPos = xPos; 
         this.yPos = yPos; 
+
+        //// The width and height of the objects
+        this.width = width; 
+        this.height = height; 
         
         this.dy = dy;                       // Dropping top to bottom of y coordinates 
+        this.isCollide = isCollide; 
 
     }//end constructor()
 
@@ -65,7 +71,7 @@ class AlphaNumericChar extends BaseSprite
 {
 
  
-    constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, dy=0.5)
+    constructor(ctx, id, alphaNumericChar='A', charSize='20', xPos, yPos=30, dy=0.5)
     {
         super(ctx, id, alphaNumericChar, charSize, xPos, yPos, dy); 
        
@@ -73,13 +79,29 @@ class AlphaNumericChar extends BaseSprite
 
     drawChar()
     {
-        // const xPos = Math.random() * CANVAS_WIDTH; 
-        // const yPos = 30; 
+        
         this.ctx.beginPath(); 
         this.ctx.fillStyle = '#00FF00'; 
 
-        this.ctx.font = `${this.charSize } Arial`; 
+        this.ctx.font = `${ this.charSize }px Arial`; 
         this.ctx.fillText(`${this.alphaNumericChar}`, this.xPos, this.yPos); 
+
+        let fontHeight = parseInt(this.ctx.font.match(/\d+/), 10); 
+
+
+        this.width = this.ctx.measureText(this.alphaNumericChar).width; 
+        this.height = fontHeight; 
+
+
+        //// Getting the width and height of the font 
+        // console.log(`Font: W: ${this.width}, H: ${this.height}`);
+
+        //// Rectangle box 
+        this.ctx.strokeStyle = '#FF0000'; 
+
+        this.ctx.rect(this.xPos , this.yPos - (this.height - 3), this.width, this.height); 
+        this.ctx.stroke();
+
         this.ctx.closePath();
 
     }// end drawChar()
@@ -87,7 +109,7 @@ class AlphaNumericChar extends BaseSprite
     move()
     {
         this.yPos += this.dy; 
-        console.log(`Alphabet ${this.alphaNumericChar} [x,y]: [${this.xPos}, ${this.yPos}]`);
+        // console.log(`Alphabet ${this.alphaNumericChar} [x,y]: [${this.xPos}, ${this.yPos}]`);
 
     }// end move()
 
@@ -97,12 +119,12 @@ class AlphaNumericChar extends BaseSprite
 // 
 class Bullet extends BaseSprite
 {
-    constructor(ctx, id, alphaNumericChar, xPos=200, yPos=200, bulletWidth, bulletHeight, isFired=false, dy)
+    constructor(ctx, id, alphaNumericChar, xPos=200, yPos=200, width, height, isFired=false, dy)
     {
-        super(ctx, id, alphaNumericChar, charSize, xPos, yPos, dy); 
+        super(ctx, id, alphaNumericChar, charSize, xPos, yPos, width, height, dy); 
 
-        this.bulletWidth = bulletWidth; 
-        this.bulletHeight = bulletHeight; 
+        // this.width = width; 
+        // this.height = height; 
 
         this.isFired = isFired;             // To shoot the alphabets
         this.dy = dy; 
@@ -119,7 +141,7 @@ class Bullet extends BaseSprite
         this.ctx.fillStyle = '#FF0000'; 
 
         // this.ctx.fillRect(this.xPos / 2, this.yPos - (this.bulletHeight * 2), this.bulletWidth, this.bulletHeight); 
-        this.ctx.fillRect(this.xPos , this.yPos, this.bulletWidth, this.bulletHeight); 
+        this.ctx.fillRect(this.xPos , this.yPos, this.width, this.height); 
 
         this.ctx.closePath();
 
@@ -127,8 +149,17 @@ class Bullet extends BaseSprite
 
     drawRocket()
     {
+        this.ctx.beginPath(); 
+
 
         this.ctx.drawImage(imageObj, this.xPos, this.yPos);
+
+        this.ctx.strokeStyle = '#FF0000'; 
+
+        // this.ctx.fillRect(this.xPos / 2, this.yPos - (this.bulletHeight * 2), this.bulletWidth, this.bulletHeight); 
+        this.ctx.rect(this.xPos , this.yPos, this.width, this.height); 
+        this.ctx.stroke();
+        this.ctx.closePath();
 
     }// end drawCanon()
 
@@ -136,7 +167,7 @@ class Bullet extends BaseSprite
     move()
     {
         this.yPos -= this.dy;  
-        console.log(`Rocket ${this.alphaNumericChar} [x,y]: [${this.xPos}, ${this.yPos}]`);
+        // console.log(`Rocket ${this.alphaNumericChar} [x,y]: [${this.xPos}, ${this.yPos}]`);
         
     }// end move()
 
@@ -155,8 +186,23 @@ function getRandom_yPos()
     return (Math.random() * 100) - 50; 
 }// end getRandom_yPos()
 
-function detectCollision()
+function detectCollision(word, rocket)
 {
+    if (word.isCollide == false && rocket.isCollide == false &&
+        word.xPos < rocket.xPos + rocket.width &&
+        word.xPos + word.width > rocket.xPos &&
+        word.yPos < rocket.yPos + rocket.height && 
+        word.yPos + word.height > rocket.yPos
+       )
+    {
+        console.log('=========================================');
+        console.log(`Collision Detect: [${Math.round(word.yPos)}, ${rocket.yPos - 2}]`);
+
+        //// Object collides 
+        word.isCollide = true;
+        rocket.isCollide = true;  
+
+    }
 
 }// end detectCollision()
 
@@ -177,11 +223,11 @@ function init()
             let dy = 0.25; 
             let xPos = getRandom_xPos(); 
 
-            let ch = new AlphaNumericChar(ctx=ctx, id=i, alphaNumericChar=chosenChar, charSize='20px', xPos=xPos, yPos=getRandom_yPos(), dy=dy); 
+            let ch = new AlphaNumericChar(ctx=ctx, id=i, alphaNumericChar=chosenChar, charSize='20', xPos=xPos, yPos=getRandom_yPos(), dy=dy); 
             charObjectArray.push(ch); 
 
             let rocket = new Bullet(ctx, id=i, alphaNumericChar=chosenChar, xPos=xPos, yPos=CANVAS_HEIGHT, bulletWidth, bulletHeight, isFired=false, dy=(dy * 8)); 
-            rocketArray.push(rocket)
+            rocketArray.push(rocket); 
 
         }// end for 
 
@@ -190,15 +236,38 @@ function init()
 
     }// end if 
 
-    for (let i=0; i < charObjectArray.length; i++)
+    // for (let i=0; i < charObjectArray.length; i++)
+    // {
+    //     charObjectArray[i].drawChar(); 
+    //     charObjectArray[i].move(); 
+    // }// end for 
+
+    // //// Searching the key 
+    // for (let i=0; i < rocketArray.length; i++)
+    // {
+    //     if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
+    //     {
+    //         rocketArray[i].isFired = true; 
+
+    //         console.log(`Found: ${keyDownChar}`);
+    //         //// Reset the char 
+    //         keyDownChar = ''; 
+    //     }// end if
+        
+    //     if (rocketArray[i].isFired)
+    //     {
+    //         rocketArray[i].drawRocket(); 
+    //         rocketArray[i].move(); 
+    //     }
+
+    // }// end for 
+
+
+    for (let i = 0; i < NUM_OF_CHARS; i++)
     {
         charObjectArray[i].drawChar(); 
         charObjectArray[i].move(); 
-    }// end for 
 
-    //// Searching the key 
-    for (let i=0; i < rocketArray.length; i++)
-    {
         if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
         {
             rocketArray[i].isFired = true; 
@@ -212,8 +281,12 @@ function init()
         {
             rocketArray[i].drawRocket(); 
             rocketArray[i].move(); 
-        }
 
+             //// Detect Collision 
+             detectCollision(charObjectArray[i], rocketArray[i]); 
+
+            
+        }
     }// end for 
 
     
