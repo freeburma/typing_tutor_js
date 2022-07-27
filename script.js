@@ -14,7 +14,7 @@ const cannonHeight = 20;
 const bulletWidth = 10; 
 const bulletHeight = 20; 
 
-const NUM_OF_CHARS = 1; 
+const NUM_OF_CHARS = 10; 
 let dY = 0.25; 
 
 const imageObj = new Image;
@@ -43,7 +43,7 @@ let keyDownChar = '';
 
 class BaseSprite
 {
-    constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, width, height, dy=0.5, isCollide=false)
+    constructor(ctx, id, alphaNumericChar='A', charSize='20px', xPos, yPos=30, width, height, dy=0.5, isDisplay=true)
     {
         this.ctx = ctx;                     // Canvas 
 
@@ -60,7 +60,7 @@ class BaseSprite
         this.height = height; 
         
         this.dy = dy;                       // Dropping top to bottom of y coordinates 
-        this.isCollide = isCollide; 
+        this.isDisplay = isDisplay; 
 
     }//end constructor()
 
@@ -188,7 +188,7 @@ function getRandom_yPos()
 
 function detectCollision(word, rocket)
 {
-    if (word.isCollide == false && rocket.isCollide == false &&
+    if (word.isDisplay && rocket.isDisplay &&
         word.xPos < rocket.xPos + rocket.width &&
         word.xPos + word.width > rocket.xPos &&
         word.yPos < rocket.yPos + rocket.height && 
@@ -199,8 +199,8 @@ function detectCollision(word, rocket)
         console.log(`Collision Detect: [${Math.round(word.yPos)}, ${rocket.yPos - 2}]`);
 
         //// Object collides 
-        word.isCollide = true;
-        rocket.isCollide = true;  
+        word.isDisplay = false;
+        rocket.isDisplay = false;  
 
     }
 
@@ -265,19 +265,22 @@ function init()
 
     for (let i = 0; i < NUM_OF_CHARS; i++)
     {
-        charObjectArray[i].drawChar(); 
-        charObjectArray[i].move(); 
+        if ( charObjectArray[i].isDisplay)
+        {
+            charObjectArray[i].drawChar(); 
+            charObjectArray[i].move(); 
+            }
 
         if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
         {
             rocketArray[i].isFired = true; 
 
-            console.log(`Found: ${keyDownChar}`);
+            // console.log(`Found: ${keyDownChar}`);
             //// Reset the char 
             keyDownChar = ''; 
         }// end if
         
-        if (rocketArray[i].isFired)
+        if (rocketArray[i].isFired &&  rocketArray[i].isDisplay)
         {
             rocketArray[i].drawRocket(); 
             rocketArray[i].move(); 
@@ -309,7 +312,7 @@ function keyDownHandler(e)
 {
    
     keyDownChar = e.key; 
-    console.log(`Key: `, keyDownChar);
+    // console.log(`Key: `, keyDownChar);
 
     
 }// end keyDownHandler(e)
