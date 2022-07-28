@@ -66,6 +66,7 @@ class BaseSprite
         
         this.dy = dy;                       // Dropping top to bottom of y coordinates 
         this.isDisplay = isDisplay; 
+        this.isRectangleDisplay = false;
 
     }//end constructor()
 
@@ -102,12 +103,15 @@ class AlphaNumericChar extends BaseSprite
         // console.log(`Font: W: ${this.width}, H: ${this.height}`);
 
         //// Rectangle box 
-        this.ctx.strokeStyle = '#FF0000'; 
+        if ( this.isRectangleDisplay )
+        {
+            this.ctx.strokeStyle = '#FF0000'; 
 
-        this.ctx.rect(this.xPos , this.yPos - (this.height - 3), this.width, this.height); 
-        this.ctx.stroke();
+            this.ctx.rect(this.xPos , this.yPos - (this.height - 3), this.width, this.height); 
+            this.ctx.stroke();
 
-        this.ctx.closePath();
+            this.ctx.closePath();
+        }
 
     }// end drawChar()
 
@@ -157,12 +161,16 @@ class Bullet extends BaseSprite
 
         this.ctx.drawImage(imageObj, this.xPos, this.yPos);
 
-        this.ctx.strokeStyle = '#FF0000'; 
+        if ( this.isRectangleDisplay )
+        {
 
-        // this.ctx.fillRect(this.xPos / 2, this.yPos - (this.bulletHeight * 2), this.bulletWidth, this.bulletHeight); 
-        this.ctx.rect(this.xPos , this.yPos, this.width, this.height); 
-        this.ctx.stroke();
-        this.ctx.closePath();
+            this.ctx.strokeStyle = '#FF0000'; 
+
+            // this.ctx.fillRect(this.xPos / 2, this.yPos - (this.bulletHeight * 2), this.bulletWidth, this.bulletHeight); 
+            this.ctx.rect(this.xPos , this.yPos, this.width, this.height); 
+            this.ctx.stroke();
+            this.ctx.closePath();
+        }
 
     }// end drawCanon()
 
