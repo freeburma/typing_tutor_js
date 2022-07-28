@@ -242,32 +242,6 @@ function init()
 
     }// end if 
 
-    // for (let i=0; i < charObjectArray.length; i++)
-    // {
-    //     charObjectArray[i].drawChar(); 
-    //     charObjectArray[i].move(); 
-    // }// end for 
-
-    // //// Searching the key 
-    // for (let i=0; i < rocketArray.length; i++)
-    // {
-    //     if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
-    //     {
-    //         rocketArray[i].isFired = true; 
-
-    //         console.log(`Found: ${keyDownChar}`);
-    //         //// Reset the char 
-    //         keyDownChar = ''; 
-    //     }// end if
-        
-    //     if (rocketArray[i].isFired)
-    //     {
-    //         rocketArray[i].drawRocket(); 
-    //         rocketArray[i].move(); 
-    //     }
-
-    // }// end for 
-
 
     for (let i = 0; i < NUM_OF_CHARS; i++)
     {
