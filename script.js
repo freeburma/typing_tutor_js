@@ -18,7 +18,7 @@ const NUM_OF_CHARS = 10;
 let dY = 0.25; 
 
 const imageObj = new Image;
-imageObj.src = './Assets/imgs/rocket_12.png';
+imageObj.src = './assets/imgs/rocket_12.png';
 
 
 //// Characters List 
@@ -38,6 +38,11 @@ let rocketArray = [];
 
 let isInit = true; 
 let keyDownChar = ''; 
+
+//// Adding audio effects 
+let explosionAudio = new Audio('./assets/sounds/explosion-6055.mp3');
+let shootingAudio = new Audio('./assets/sounds/sniper-rifle-5989.mp3');
+
 
 // console.log(`Canvas: ${CANVAS_WIDTH}, ${CANVAS_HEIGHT}`);
 
@@ -129,8 +134,6 @@ class Bullet extends BaseSprite
         this.isFired = isFired;             // To shoot the alphabets
         this.dy = dy; 
         
-
-
     }// end constructor()
 
     
@@ -195,12 +198,15 @@ function detectCollision(word, rocket)
         word.yPos + word.height > rocket.yPos
        )
     {
-        console.log('=========================================');
+        console.log('========================');
         console.log(`Collision Detect: [${Math.round(word.yPos)}, ${rocket.yPos - 2}]`);
 
         //// Object collides 
         word.isDisplay = false;
         rocket.isDisplay = false;  
+
+
+        explosionAudio.play(); 
 
     }
 
@@ -274,7 +280,9 @@ function init()
         if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
         {
             rocketArray[i].isFired = true; 
-
+            
+            
+            shootingAudio.play();       // Adding shooting sound
             // console.log(`Found: ${keyDownChar}`);
             //// Reset the char 
             keyDownChar = ''; 
