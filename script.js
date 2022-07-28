@@ -181,12 +181,12 @@ class Bullet extends BaseSprite
 
 function getRandom_xPos()
 {
-    return Math.random() * CANVAS_WIDTH; 
+    return Math.floor(Math.random() * CANVAS_WIDTH); 
 }// end getRandom_xPos()
 
 function getRandom_yPos()
 {
-    return (Math.random() * 100) - 50; 
+    return Math.floor((Math.random() * 100) - 50); 
 }// end getRandom_yPos()
 
 function detectCollision(word, rocket)
@@ -213,14 +213,18 @@ function detectCollision(word, rocket)
 }// end detectCollision()
 
 
+
+
 /**
     All the initialize objects must be inside the "IF" or outside of this loop. 
  */
 function init()
 {
  
+    //// Initializing the game 
     if (isInit) // Will only do one time 
     {
+        //// Generating the chars and rockets. 
         for (let i = 0; i < NUM_OF_CHARS; i++)
         {
             const randomCharIndex = Math.floor(Math.random() * (charList.length - 1)); 
@@ -243,14 +247,19 @@ function init()
     }// end if 
 
 
+    //// Main loop for moving the Chars and Rockets
     for (let i = 0; i < NUM_OF_CHARS; i++)
     {
+        //// Drawing chars on the Screen.
         if ( charObjectArray[i].isDisplay)
         {
             charObjectArray[i].drawChar(); 
             charObjectArray[i].move(); 
-            }
 
+        }// end if 
+
+        //// Looking for char in the rocket array and setting "isFire" to True. So the rocket 
+        //// will appear on the screen. 
         if (rocketArray[i].alphaNumericChar == keyDownChar && rocketArray[i].isFired == false)
         {
             rocketArray[i].isFired = true; 
@@ -260,8 +269,10 @@ function init()
             // console.log(`Found: ${keyDownChar}`);
             //// Reset the char 
             keyDownChar = ''; 
+
         }// end if
         
+        //// Drawing the rockets on the screen
         if (rocketArray[i].isFired &&  rocketArray[i].isDisplay)
         {
             rocketArray[i].drawRocket(); 
@@ -269,9 +280,33 @@ function init()
 
              //// Detect Collision 
              detectCollision(charObjectArray[i], rocketArray[i]); 
-
             
         }
+
+        if ((charObjectArray[i].isDisplay == false && rocketArray[i].isDisplay == false) 
+            || (charObjectArray[i].yPos > CANVAS_HEIGHT)
+        )
+        {
+            const randomCharIndex = Math.floor(Math.random() * (charList.length - 1)); 
+
+            let chosenChar = charList[randomCharIndex];
+            let dy = 0.25; 
+            let xPos = getRandom_xPos(); 
+
+            charObjectArray[i].alphaNumericChar = chosenChar; 
+            charObjectArray[i].xPos = xPos; 
+            charObjectArray[i].yPos = getRandom_yPos(); 
+            charObjectArray[i].isDisplay = true; 
+
+
+            rocketArray[i].alphaNumericChar = chosenChar; 
+            rocketArray[i].xPos = xPos; 
+            rocketArray[i].yPos = CANVAS_HEIGHT; 
+            rocketArray[i].isDisplay = true; 
+            rocketArray[i].isFired = false; 
+            
+        }// end if 
+
     }// end for 
 
     
@@ -299,19 +334,10 @@ function keyDownHandler(e)
     
 }// end keyDownHandler(e)
 
-// function keyUpHandler(e)
-// {
-//     keyDownChar = ''; 
-    
-// }// end keyUpHandler(e)
-
 
 document.addEventListener('keydown', keyDownHandler, false); 
-// document.addEventListener('keyup', keyUpHandler, false); 
-
 
 
 //// ============================== Key Pressed Handlers  END  ============================================
 
-// init(); 
 renderGame(); 
