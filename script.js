@@ -5,8 +5,8 @@ canvas.height = window.innerHeight;
 
 let ctx = canvas.getContext('2d'); 
 
-const CANVAS_WIDTH = canvas.width - 50; 
-const CANVAS_HEIGHT = canvas.height; 
+const CANVAS_WIDTH = canvas.width - 20; 
+const CANVAS_HEIGHT = canvas.height - 40; 
 
 const cannonWidth = 10; 
 const cannonHeight = 20; 
@@ -17,8 +17,25 @@ const bulletHeight = 20;
 const NUM_OF_CHARS = 10; 
 let dY = 0.25; 
 
+let totalSec = 0; 
+let framePerSec = 1; 
+
+//// Loading image here to save network and save memory
 const imageObj = new Image;
 imageObj.src = './assets/imgs/rocket_12.png';
+
+//// ======================================================
+//// Game Logic Global Variables
+//// ======================================================
+let totalScore = 0; 
+let totalScoreId = document.querySelector('#totalScoreId'); 
+
+let numOfTotalMiss = 0; 
+let totalMissedId = document.querySelector('#totalMissedId'); 
+
+let yourAccuracyId = document.querySelector('#yourAccuracyId'); 
+
+//// ======================================================
 
 
 //// Characters List 
@@ -202,8 +219,8 @@ function detectCollision(word, rocket)
     if (word.isDisplay && rocket.isDisplay &&
         word.xPos < rocket.xPos + rocket.width &&
         word.xPos + word.width > rocket.xPos &&
-        word.yPos < rocket.yPos + rocket.height && 
-        word.yPos + word.height > rocket.yPos
+        word.yPos < ((rocket.yPos + rocket.height)) && 
+        ((word.yPos + word.height)) > rocket.yPos
        )
     {
         console.log('========================');
@@ -213,14 +230,38 @@ function detectCollision(word, rocket)
         word.isDisplay = false;
         rocket.isDisplay = false;  
 
+        //// Total score for hitting
+        totalScore += 1; 
+        totalScoreId.innerHTML = totalScore;
+
+        
 
         explosionAudio.play(); 
 
-    }
+    }// end if 
 
 }// end detectCollision()
 
+function renewObject(i)
+{
+    const randomCharIndex = Math.floor(Math.random() * (charList.length - 1)); 
 
+    let chosenChar = charList[randomCharIndex];
+    let dy = 0.25; 
+    let xPos = getRandom_xPos(); 
+
+    charObjectArray[i].alphaNumericChar = chosenChar; 
+    charObjectArray[i].xPos = xPos; 
+    charObjectArray[i].yPos = getRandom_yPos(); 
+    charObjectArray[i].isDisplay = true; 
+
+
+    rocketArray[i].alphaNumericChar = chosenChar; 
+    rocketArray[i].xPos = xPos; 
+    rocketArray[i].yPos = CANVAS_HEIGHT; 
+    rocketArray[i].isDisplay = true; 
+    rocketArray[i].isFired = false; 
+}
 
 
 /**
@@ -228,7 +269,23 @@ function detectCollision(word, rocket)
  */
 function init()
 {
- 
+    let tempTotal = ((totalScore / numOfTotalMiss) * 10).toFixed(2); 
+
+
+    if (numOfTotalMiss <= 0)
+    {
+        yourAccuracyId.innerHTML = '100%';
+    }
+    else if (tempTotal > 0)
+    {
+        //// Calculating Speed per Minute 
+        yourAccuracyId.innerHTML = `${ tempTotal }%` ;
+    }
+    else 
+    {
+        yourAccuracyId.innerHTML = `0.0%` ;
+    }
+
     //// Initializing the game 
     if (isInit) // Will only do one time 
     {
@@ -238,7 +295,7 @@ function init()
             const randomCharIndex = Math.floor(Math.random() * (charList.length - 1)); 
 
             let chosenChar = charList[randomCharIndex];
-            let dy = 0.25; 
+            let dy = 0.25; // With animation frame
             let xPos = getRandom_xPos(); 
 
             let ch = new AlphaNumericChar(ctx=ctx, id=i, alphaNumericChar=chosenChar, charSize='20', xPos=xPos, yPos=getRandom_yPos(), dy=dy); 
@@ -291,29 +348,29 @@ function init()
             
         }
 
-        if ((charObjectArray[i].isDisplay == false && rocketArray[i].isDisplay == false) 
-            || (charObjectArray[i].yPos > CANVAS_HEIGHT)
-        )
+        
+
+        //// Hit
+        if ((charObjectArray[i].isDisplay == false && rocketArray[i].isDisplay == false))
         {
-            const randomCharIndex = Math.floor(Math.random() * (charList.length - 1)); 
+            renewObject(i); 
 
-            let chosenChar = charList[randomCharIndex];
-            let dy = 0.25; 
-            let xPos = getRandom_xPos(); 
+        }// end if 
 
-            charObjectArray[i].alphaNumericChar = chosenChar; 
-            charObjectArray[i].xPos = xPos; 
-            charObjectArray[i].yPos = getRandom_yPos(); 
-            charObjectArray[i].isDisplay = true; 
+        //// Missed 
+        if (charObjectArray[i].yPos > CANVAS_HEIGHT)
+        {
+            renewObject(i); 
 
+            numOfTotalMiss += 1; 
+            totalMissedId.innerHTML = numOfTotalMiss; 
 
-            rocketArray[i].alphaNumericChar = chosenChar; 
-            rocketArray[i].xPos = xPos; 
-            rocketArray[i].yPos = CANVAS_HEIGHT; 
-            rocketArray[i].isDisplay = true; 
-            rocketArray[i].isFired = false; 
+            isRenewObj = true; // Redrawing the object
             
         }// end if 
+
+
+        
 
     }// end for 
 
@@ -321,14 +378,23 @@ function init()
     
 }// init()
 
- 
+
 function renderGame()
 {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); 
 
     init(); 
 
-    window.requestAnimationFrame(renderGame); 
+    console.log(`Sec: ${totalSec}`);
+    framePerSec ++; 
+
+    if (framePerSec >= 120) 
+    {
+        totalSec ++; 
+        framePerSec = 1; 
+    }// end if 
+
+    window.requestAnimationFrame(renderGame); // 120 frames/sec
 
 }// end renderGame()
 
@@ -349,3 +415,5 @@ document.addEventListener('keydown', keyDownHandler, false);
 //// ============================== Key Pressed Handlers  END  ============================================
 
 renderGame(); 
+
+// setInterval(renderGame, 10);
