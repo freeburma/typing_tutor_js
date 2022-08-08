@@ -20,9 +20,15 @@ let dY = 0.25;
 let totalSec = 0; 
 let framePerSec = 1; 
 
+let isCodePen = true; 
+
+let imageObj; 
 //// Loading image here to save network and save memory
-const imageObj = new Image;
-imageObj.src = './assets/imgs/rocket_12.png';
+if ( ! isCodePen )
+{
+    imageObj = new Image;
+    imageObj.src = './assets/imgs/rocket_12.png';    
+}// end if 
 
 //// ======================================================
 //// Game Logic Global Variables
@@ -56,9 +62,15 @@ let rocketArray = [];
 let isInit = true; 
 let keyDownChar = ''; 
 
+let explosionAudio; 
+let shootingAudio; 
+
 //// Adding audio effects 
-let explosionAudio = new Audio('./assets/sounds/explosion-6055.mp3');
-let shootingAudio = new Audio('./assets/sounds/sniper-rifle-5989.mp3');
+if ( ! isCodePen )
+{
+    explosionAudio = new Audio('./assets/sounds/explosion-6055.mp3');
+    shootingAudio = new Audio('./assets/sounds/sniper-rifle-5989.mp3');
+}// end if 
 
 
 // console.log(`Canvas: ${CANVAS_WIDTH}, ${CANVAS_HEIGHT}`);
@@ -161,22 +173,31 @@ class Bullet extends BaseSprite
     drawBullet()
     {
 
-        this.ctx.beginPath(); 
-        this.ctx.fillStyle = '#FF0000'; 
-
-        // this.ctx.fillRect(this.xPos / 2, this.yPos - (this.bulletHeight * 2), this.bulletWidth, this.bulletHeight); 
-        this.ctx.fillRect(this.xPos , this.yPos, this.width, this.height); 
-
-        this.ctx.closePath();
+       
 
     }// end drawCanon()
 
     drawRocket()
     {
-        this.ctx.beginPath(); 
+
+        if (isCodePen)
+        {
+            this.ctx.beginPath(); 
+            this.ctx.fillStyle = '#FF0000'; 
+    
+            // this.ctx.fillRect(this.xPos / 2, this.yPos - (this.bulletHeight * 2), this.bulletWidth, this.bulletHeight); 
+            this.ctx.fillRect(this.xPos , this.yPos, this.width, this.height); 
+    
+            this.ctx.closePath();
+        }
+        else 
+        {
+            this.ctx.beginPath(); 
+            this.ctx.drawImage(imageObj, this.xPos, this.yPos);
+            this.ctx.closePath();
+        }// end if 
 
 
-        this.ctx.drawImage(imageObj, this.xPos, this.yPos);
 
         if ( this.isRectangleDisplay )
         {
@@ -223,8 +244,8 @@ function detectCollision(word, rocket)
         ((word.yPos + word.height)) > rocket.yPos
        )
     {
-        console.log('========================');
-        console.log(`Collision Detect: [${Math.round(word.yPos)}, ${rocket.yPos - 2}]`);
+        // console.log('========================');
+        // console.log(`Collision Detect: [${Math.round(word.yPos)}, ${rocket.yPos - 2}]`);
 
         //// Object collides 
         word.isDisplay = false;
@@ -235,8 +256,11 @@ function detectCollision(word, rocket)
         totalScoreId.innerHTML = totalScore;
 
         
+        if ( ! isCodePen )
+        {
+            explosionAudio.play(); 
 
-        explosionAudio.play(); 
+        }// end if 
 
     }// end if 
 
@@ -329,8 +353,11 @@ function init()
         {
             rocketArray[i].isFired = true; 
             
-            
-            shootingAudio.play();       // Adding shooting sound
+            if ( ! isCodePen )
+            {
+                shootingAudio.play();       // Adding shooting sound
+            }// end if 
+
             // console.log(`Found: ${keyDownChar}`);
             //// Reset the char 
             keyDownChar = ''; 
@@ -385,7 +412,7 @@ function renderGame()
 
     init(); 
 
-    console.log(`Sec: ${totalSec}`);
+    // console.log(`Sec: ${totalSec}`);
     framePerSec ++; 
 
     if (framePerSec >= 120) 
@@ -401,7 +428,7 @@ function renderGame()
 //// ============================== Key Pressed Handlers Start ============================================
 function keyDownHandler(e)
 {
-   
+    e.preventDefault();
     keyDownChar = e.key; 
     // console.log(`Key: `, keyDownChar);
 
